@@ -49,4 +49,15 @@ READ of size 4 at 0x... thread T0
 
 ## 实现思路
 
-待完成……
+init：先判断容量是否为零或过大，然后给v->data一块内存统一管理，然后根据end，cap与data的相对关系移动指针
+destroy：先通过data释放内存（init时确认过以data进行管理），再清除指针（设为NULL）
+size、capacity：二者同理，先查v、v->data不为空指针，防止后面两个NULL相减。然后指针相减得到数据。
+empty：通过size（v）运算
+get：index与end的移动类似，都是相对于data。index是将指针移动到数组内的一个位置。检查：v非空，index小于size
+set：将get的实现转化为设置数
+front、back：先判断是否为空（empty），再取数
+push_back:先做基本检查：v非空，然后分四种情况：直接加，从零开始加（此时data尚未获取内存，根据题目要求，得在此处实现一个类似init的函数），加多了而退出，reserve成功再push_back四种情况。
+pop_back:直接移动end指针就行，end以及后面的空间逻辑无效
+reserve：先判断是否增加（reserve只增不减），前文所述“加多了退出”也在此判断，然后通过realloc函数给data分配内存，并把end，cap的值进行修正
+shrink_to_fit:本质上和reserve相同，都是给data一块新的内存空间，但此处需要把size（v）==0单独拎出来，因为此处与destroy效果相同。
+clear：移动end就行
